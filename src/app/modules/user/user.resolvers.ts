@@ -1,7 +1,7 @@
-import { userServices } from "./user.services";
-import { auth } from "../../middlewares/auth";
-import { User } from "@prisma/client";
-import catchAsync from "../../../shared/catchAsync";
+import { userServices } from './user.services';
+import { auth } from '../../middlewares/auth';
+import { User } from '@prisma/client';
+import catchAsync from '../../../shared/catchAsync';
 
 export const userResolvers = {
   Query: {
@@ -12,7 +12,7 @@ export const userResolvers = {
 
     //get user by id
     user: async (_parent: any, args: { id: string }, context: any) => {
-      if (!context.user) throw new Error("Not authenticated");
+      if (!context.user) throw new Error('Not authenticated');
       return await userServices.getSingleUserFromDB(args.id);
     },
 
@@ -41,7 +41,12 @@ export const userResolvers = {
       const result = await userServices.updateProfile(payload);
       return result;
     },
-
+    // update me
+    updateMe: async (_parent: any, payload: User, context: any) => {
+      const user = await auth(context);
+      const result = await userServices.updateMe(user.id, payload);
+      return result;
+    },
     //delete user
     deleteUser: async (_parent: any, args: { id: string }) => {
       const result = await userServices.deleteUserFromDB(args.id);

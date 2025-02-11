@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from 'apollo-server';
 
 export const userDefs = gql`
   type User {
@@ -22,19 +22,23 @@ export const userDefs = gql`
     me: User
   }
 
-  #   type DeleteResponse {
-  #   success: Boolean!
-  #   message: String!
-  # }
-
   type Mutation {
     signup(
       firstName: String!
       lastName: String!
+      address: String
       email: String!
+      phone: String
       password: String!
     ): AuthPayload!
     login(email: String!, password: String!): AuthPayload!
+    updateMe(
+      firstName: String
+      lastName: String
+      address: String
+      email: String
+      phone: String
+    ): User
     updateProfile(id: ID!, name: String!, email: String!): User
     deleteUser(id: ID!): User
   }
