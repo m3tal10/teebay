@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id        String  @id @unique @default(uuid())
+  id        String    @id @unique @default(uuid())
   firstName String
   lastName  String
   address   String?
-  email     String  @unique
+  email     String    @unique
   phone     String?
   password  String
+  Products  Product[]
 
   @@map("users")
 }
@@ -22,6 +23,8 @@ model User {
 model Product {
   id          String            @id @unique @default(uuid())
   title       String
+  ownerId     String
+  owner       User              @relation(fields: [ownerId], references: [id])
   categories  ProductCategory[]
   description String
   buyPrice    Float
