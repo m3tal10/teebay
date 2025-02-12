@@ -2,6 +2,7 @@ import { userServices } from './user.services';
 import { auth } from '../../middlewares/auth';
 import { User } from '@prisma/client';
 import catchAsync from '../../../shared/catchAsync';
+import ApiError from '../../../errors/ApiErrors';
 
 export const userResolvers = {
   Query: {
@@ -12,13 +13,19 @@ export const userResolvers = {
 
     //get user by id
     user: async (_parent: any, args: { id: string }, context: any) => {
-      if (!context.user) throw new Error('Not authenticated');
+      if (!context.user) throw new ApiError(401, 'Not authenticated');
       return await userServices.getSingleUserFromDB(args.id);
     },
 
     ///get my profile
     me: async (_parent: any, _args: any, context: any) => {
-      const user = await auth(context);
+      const user = context.user;
+      if (!user) {
+        throw new ApiError(
+          400,
+          "You're not logged in. Please log in to continue.",
+        );
+      }
       return user;
     },
   },
@@ -43,8 +50,7 @@ export const userResolvers = {
     },
     // update me
     updateMe: async (_parent: any, payload: User, context: any) => {
-      const user = await auth(context);
-      const result = await userServices.updateMe(user.id, payload);
+      const result = await userServices.updateMe(context, payload);
       return result;
     },
     //delete user

@@ -49,13 +49,13 @@ const loginUserInDB = async (payload: User) => {
   const user = await prisma.user.findUnique({
     where: { email: payload.email },
   });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new ApiError(404, 'User not found');
 
   const valid = await bcrypt.compare(payload.password, user.password);
   if (!valid) throw new Error('Invalid password');
 
   const token = jwt.sign(
-    { userId: user.id, email: user.email },
+    { id: user.id, email: user.email },
     config.jwt.jwt_secret as string,
   );
   return { token, user };
@@ -71,14 +71,18 @@ const updateProfile = async (payload: User) => {
   return user;
 };
 
-const updateMe = async (userId: string, payload: User) => {
-  const user = await prisma.user.update({
-    where: { id: userId },
+const updateMe = async (context: any, payload: User) => {
+  const user = context.user;
+  if (!user) {
+    throw new ApiError(400, "You're not logged in. Please log in to continue.");
+  }
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
     data: {
       ...payload,
     },
   });
-  return user;
+  return updatedUser;
 };
 
 const deleteUserFromDB = async (userId: string) => {

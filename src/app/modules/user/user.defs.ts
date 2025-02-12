@@ -39,7 +39,7 @@ export const userDefs = gql`
       email: String
       phone: String
     ): User
-    updateProfile(id: ID!, name: String!, email: String!): User
+    updateProfile(id: ID!, name: String, email: String): User
     deleteUser(id: ID!): User
   }
 `;
