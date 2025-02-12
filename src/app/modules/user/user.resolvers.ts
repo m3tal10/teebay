@@ -1,5 +1,4 @@
 import { userServices } from './user.services';
-import { auth } from '../../middlewares/auth';
 import { User } from '@prisma/client';
 import catchAsync from '../../../shared/catchAsync';
 import ApiError from '../../../errors/ApiErrors';

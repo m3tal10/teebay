@@ -1,5 +1,6 @@
-import { userDefs } from "../app/modules/user/user.defs";
+import { productDefs } from '../app/modules/product/product.defs';
+import { userDefs } from '../app/modules/user/user.defs';
 
-const typeDefs = [userDefs];
+const typeDefs = [userDefs, productDefs];
 
 export default typeDefs;

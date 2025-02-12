@@ -18,3 +18,30 @@ model User {
 
   @@map("users")
 }
+
+model Product {
+  id          String            @id @unique @default(uuid())
+  title       String
+  categories  ProductCategory[]
+  description String
+  buyPrice    Float
+  rentPrice   Float
+  rentOption  RentOption
+
+  @@map("products")
+}
+
+enum RentOption {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum ProductCategory {
+  ELECTRONICS
+  FURNITURE
+  HOME_APPLIANCES
+  SPORTING_GOODS
+  OUTDOOR
+  TOYS
+}
