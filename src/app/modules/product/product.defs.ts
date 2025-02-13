@@ -1,6 +1,82 @@
 import { gql } from 'apollo-server-express';
 
 export const productDefs = gql`
+  union ProductResponse = ProductErrorResponse | ProductSuccessResponse
+  union MultiProductResponse =
+    | ProductErrorResponse
+    | MultiProductSuccessResponse
+
+  interface IProductResponse {
+    success: Boolean!
+    statusCode: Int!
+    message: String!
+  }
+
+  # Error Response
+  type ProductErrorResponse implements IProductResponse {
+    success: Boolean!
+    statusCode: Int!
+    message: String!
+  }
+
+  # Success Response
+  type ProductSuccessResponse implements IProductResponse {
+    success: Boolean!
+    statusCode: Int!
+    message: String!
+    data: Product!
+  }
+
+  type MultiProductSuccessResponse implements IProductResponse {
+    success: Boolean!
+    statusCode: Int!
+    message: String!
+    data: [Product!]!
+  }
+
+  # regular types
+  type Product {
+    id: ID!
+    title: String!
+    categories: [ProductCategory!]!
+    description: String!
+    buyPrice: Float!
+    rentPrice: Float!
+    rentOption: RentOption!
+  }
+
+  # Queries
+  type Query {
+    products: MultiProductResponse!
+    myProducts: MultiProductResponse!
+    product(id: ID!): ProductResponse!
+  }
+
+  # Mutations
+  type Mutation {
+    createProduct(
+      title: String!
+      categories: [ProductCategory!]!
+      description: String!
+      buyPrice: Float!
+      rentPrice: Float!
+      rentOption: RentOption!
+    ): ProductResponse!
+
+    updateProduct(
+      id: ID!
+      title: String
+      categories: [ProductCategory!]
+      description: String
+      buyPrice: Float
+      rentPrice: Float
+      rentOption: RentOption
+    ): ProductResponse!
+
+    deleteProduct(id: ID!): Boolean!
+  }
+
+  # Enums
   enum RentOption {
     DAILY
     WEEKLY
@@ -14,44 +90,5 @@ export const productDefs = gql`
     SPORTING_GOODS
     OUTDOOR
     TOYS
-  }
-
-  type Product {
-    id: ID!
-    title: String!
-    categories: [ProductCategory!]!
-    description: String!
-    buyPrice: Float!
-    rentPrice: Float!
-    rentOption: RentOption!
-  }
-
-  type Query {
-    products: [Product!]!
-    myProducts: [Product!]!
-    product(id: ID!): Product
-  }
-
-  type Mutation {
-    createProduct(
-      title: String!
-      categories: [ProductCategory!]!
-      description: String!
-      buyPrice: Float!
-      rentPrice: Float!
-      rentOption: RentOption!
-    ): Product!
-
-    updateProduct(
-      id: ID!
-      title: String
-      categories: [ProductCategory!]
-      description: String
-      buyPrice: Float
-      rentPrice: Float
-      rentOption: RentOption
-    ): Product!
-
-    deleteProduct(id: ID!): Boolean!
   }
 `;
