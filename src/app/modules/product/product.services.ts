@@ -19,6 +19,22 @@ const getSingleProduct = async (productId: string) => {
   return product;
 };
 
+const getMyProducts = async (context: any) => {
+  const user = context.user;
+  if (!user) {
+    throw new ApiError(400, "You're not logged in. Please log in to continue.");
+  }
+  const newUser = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: user.id,
+    },
+    select: {
+      Products: true,
+    },
+  });
+  return newUser.Products;
+};
+
 const createProduct = async (context: any, payload: Product) => {
   const user = context.user;
   if (!user) {
@@ -88,6 +104,7 @@ const deleteProduct = async (context: any, productId: string) => {
 
 export const productServices = {
   getAllProductsFromDB,
+  getMyProducts,
   getSingleProduct,
   createProduct,
   updateProduct,

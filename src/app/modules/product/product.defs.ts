@@ -28,6 +28,7 @@ export const productDefs = gql`
 
   type Query {
     products: [Product!]!
+    myProducts: [Product!]!
     product(id: ID!): Product
   }
 
