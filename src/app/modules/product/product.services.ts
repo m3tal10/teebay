@@ -4,6 +4,7 @@ import prisma from '../../../helpers/prisma';
 import authenticateUser from '../../../helpers/authenticateUser';
 
 const getAllProductsFromDB = async (context: any) => {
+  // helper function to authenticate user or throw error...
   const user = context.user;
   authenticateUser(user);
   const products = await prisma.product.findMany({
@@ -30,7 +31,6 @@ const getSingleProduct = async (productId: string) => {
 
 const getMyProducts = async (context: any) => {
   const user = context.user;
-  // helper function to authenticate user or throw error...
 
   authenticateUser(user);
   const newUser = await prisma.user.findUniqueOrThrow({
@@ -129,6 +129,12 @@ const rentProduct = async (
       ' This product is not available anymore.',
     );
   }
+  if (user.id === product.ownerId) {
+    throw new AppError(
+      ErrorTypes.BAD_REQUEST,
+      'You cannot rent your own product.',
+    );
+  }
   // Checking if the product is already up for rent at the specified time.
   const existingRental = await prisma.productRent.findFirst({
     where: {
@@ -177,6 +183,13 @@ const buyProduct = async (context: any, productId: string) => {
     throw new AppError(
       ErrorTypes.BAD_REQUEST,
       'This product is not available for sell anymore.',
+    );
+  }
+
+  if (user.id === product.ownerId) {
+    throw new AppError(
+      ErrorTypes.BAD_REQUEST,
+      'You cannot buy your own product.',
     );
   }
 

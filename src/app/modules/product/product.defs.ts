@@ -31,6 +31,7 @@ export const productDefs = gql`
     rentPrice: Float!
     status: ProductStatus!
     rentOption: RentOption!
+    viewCount: Int!
     createdAt: String!
     updatedAt: String!
   }
