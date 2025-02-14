@@ -41,6 +41,22 @@ const getMyProducts = async (context: any) => {
   return newUser.Products;
 };
 
+// Get currently logged in user's bought products
+
+const getBoughtProducts = async (context: any) => {
+  const user = context.user;
+  authenticateUser(user);
+  const boughtProducts = await prisma.productBuy.findMany({
+    where: {
+      buyerId: user.id,
+    },
+    select: {
+      product: true,
+    },
+  });
+  return boughtProducts.map(pb => pb.product);
+};
+
 // Rent product
 const rentProduct = async (
   context: any,
@@ -214,6 +230,7 @@ const deleteProduct = async (context: any, productId: string) => {
 export const productServices = {
   getAllProductsFromDB,
   getMyProducts,
+  getBoughtProducts,
   rentProduct,
   buyProduct,
   getSingleProduct,

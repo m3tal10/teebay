@@ -23,6 +23,14 @@ export const productResolvers = {
       const products = await productServices.getMyProducts(context);
       return products;
     }),
+
+    // Get currently logged in user's bought products
+    boughtProducts: catchAsync(
+      async (_parent: any, _args: any, context: any) => {
+        const products = await productServices.getBoughtProducts(context);
+        return products;
+      },
+    ),
   },
   Mutation: {
     // Create a new product

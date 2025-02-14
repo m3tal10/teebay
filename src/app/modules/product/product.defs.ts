@@ -7,6 +7,12 @@ export const productDefs = gql`
     MONTHLY
   }
 
+  enum ProductStatus {
+    AVAILABLE
+    LENT
+    SOLD
+  }
+
   enum ProductCategory {
     ELECTRONICS
     FURNITURE
@@ -23,13 +29,17 @@ export const productDefs = gql`
     description: String!
     buyPrice: Float!
     rentPrice: Float!
+    status: ProductStatus!
     rentOption: RentOption!
+    createdAt: String!
+    updatedAt: String!
   }
 
   type Query {
     products: [Product!]!
     myProducts: [Product!]!
     product(id: ID!): Product
+    boughtProducts: [Product!]!
   }
 
   type Mutation {
