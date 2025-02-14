@@ -33,6 +33,7 @@ const getMyProducts = async (context: any) => {
   return newUser.Products;
 };
 
+// Rent product
 const rentProduct = async (
   context: any,
   productId: string,
@@ -81,6 +82,60 @@ const rentProduct = async (
   return product;
 };
 
+// Buy product
+const buyProduct = async (context: any, productId: string) => {
+  const user = context.user;
+  // helper function to authenticate user or throw error...
+  authenticateUser(user);
+  const product = await prisma.product.findFirst({
+    where: {
+      id: productId,
+    },
+  });
+  if (!product) {
+    throw new AppError(
+      ErrorTypes.NOT_FOUND,
+      ' This product is not available anymore.',
+    );
+  }
+  if (product.status !== 'AVAILABLE') {
+    throw new AppError(
+      ErrorTypes.BAD_REQUEST,
+      'This product is not available for sell anymore.',
+    );
+  }
+  const productOnRent = await prisma.productRent.findFirst({
+    where: {
+      endTime: {
+        gt: new Date(Date.now()),
+      },
+    },
+  });
+  if (productOnRent) {
+    throw new AppError(
+      ErrorTypes.BAD_REQUEST,
+      'A rent is scheduled on this product. You cannot buy this product now.',
+    );
+  }
+  await prisma.$transaction(async prisma => {
+    await prisma.productBuy.create({
+      data: {
+        productId,
+        buyerId: user.id,
+      },
+    });
+    await prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        status: 'SOLD',
+      },
+    });
+    return;
+  });
+  return product;
+};
 const createProduct = async (context: any, payload: Product) => {
   const user = context.user;
   // helper function to authenticate user or throw error...
@@ -152,6 +207,7 @@ export const productServices = {
   getAllProductsFromDB,
   getMyProducts,
   rentProduct,
+  buyProduct,
   getSingleProduct,
   createProduct,
   updateProduct,
