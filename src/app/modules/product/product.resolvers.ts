@@ -38,7 +38,12 @@ export const productResolvers = {
     }),
 
     // Get currently logged in user's borrowed products
-    // borrowedProducts
+    borrowedProducts: catchAsync(
+      async (_parent: any, _args: any, context: any) => {
+        const products = await productServices.getBorrowedProducts(context);
+        return products;
+      },
+    ),
   },
   Mutation: {
     // Create a new product

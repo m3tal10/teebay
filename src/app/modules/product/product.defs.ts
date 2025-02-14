@@ -41,6 +41,8 @@ export const productDefs = gql`
     product(id: ID!): Product
     boughtProducts: [Product!]!
     soldProducts: [Product!]!
+    borrowedProducts: [Product!]!
+    lentProducts: [Product!]!
   }
 
   type Mutation {

@@ -75,6 +75,22 @@ const getSoldProducts = async (context: any) => {
   return soldProducts?.Products;
 };
 
+// Get currently logged in users borrowed products
+const getBorrowedProducts = async (context: any) => {
+  const user = context.user;
+  authenticateUser(user);
+  const borrowedProducts = await prisma.productRent.findMany({
+    where: {
+      renterId: user.id,
+    },
+    select: {
+      product: true,
+    },
+  });
+
+  return borrowedProducts.map(rp => rp.product);
+};
+
 // Rent product
 const rentProduct = async (
   context: any,
@@ -262,6 +278,7 @@ export const productServices = {
   getSoldProducts,
   rentProduct,
   buyProduct,
+  getBorrowedProducts,
   getSingleProduct,
   createProduct,
   updateProduct,
