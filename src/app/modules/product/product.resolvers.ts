@@ -7,38 +7,14 @@ export const productResolvers = {
     // Get all products
     products: catchAsync(async () => {
       const products = await productServices.getAllProductsFromDB();
-      if (!products) {
-        return {
-          success: false,
-          statusCode: 404,
-          message: 'This product is not available.',
-        };
-      }
-      return {
-        success: true,
-        statusCode: 200,
-        message: 'Products retrieved successfully.',
-        data: products,
-      };
+      return products;
     }),
 
     //Get a single product
     product: catchAsync(
       async (_parent: any, _args: { id: string }, context: any) => {
         const product = await productServices.getSingleProduct(_args.id);
-        if (!product) {
-          return {
-            success: false,
-            statusCode: 404,
-            message: 'This product is not available.',
-          };
-        }
-        return {
-          success: true,
-          statusCode: 200,
-          message: 'Product retrieved successfully.',
-          data: product,
-        };
+        return product;
       },
     ),
 
@@ -48,31 +24,6 @@ export const productResolvers = {
       return products;
     }),
   },
-
-  // specify single product response
-  ProductResponse: {
-    __resolveType(obj: any) {
-      if (obj.success) {
-        return 'ProductSuccessResponse';
-      } else if (!obj.success) {
-        return 'ProductErrorResponse';
-      }
-      return null;
-    },
-  },
-
-  // specify multiple product response
-  MultiProductResponse: {
-    __resolveType(obj: any) {
-      if (obj.success) {
-        return 'MultiProductSuccessResponse';
-      } else if (!obj.success) {
-        return 'ProductErrorResponse';
-      }
-      return null;
-    },
-  },
-
   Mutation: {
     // Create a new product
     createProduct: catchAsync(async (_parent: any, args: any, context: any) => {

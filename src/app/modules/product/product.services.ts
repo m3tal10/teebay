@@ -1,5 +1,8 @@
-import { Product } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { Product, User } from '@prisma/client';
 import ApiError from '../../../errors/ApiErrors';
+import config from '../../../config';
 import prisma from '../../../helpers/prisma';
 
 const getAllProductsFromDB = async () => {
