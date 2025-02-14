@@ -36,6 +36,7 @@ model Product {
   rentPrice     Float
   status        ProductStatus     @default(AVAILABLE)
   rentOption    RentOption
+  viewCount     Int               @default(0)
   ProductRent   ProductRent[]
   ProductBought ProductBuy[]
 

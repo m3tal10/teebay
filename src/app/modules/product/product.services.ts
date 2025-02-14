@@ -17,9 +17,12 @@ const getAllProductsFromDB = async (context: any) => {
 };
 
 const getSingleProduct = async (productId: string) => {
-  const product = await prisma.product.findFirst({
+  const product = await prisma.product.update({
     where: {
       id: productId,
+    },
+    data: {
+      viewCount: { increment: 1 },
     },
   });
   return product;
