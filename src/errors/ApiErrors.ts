@@ -1,11 +1,24 @@
+export const ErrorTypes = {
+  BAD_REQUEST: {
+    errorCode: 'BAD_USER_INPUT',
+    errorStatus: 400,
+  },
+  NOT_FOUND: {
+    errorCode: 'NOT_FOUND',
+    errorStatus: 404,
+  },
+  UNAUTHENTICATED: {
+    errorCode: 'UNAUTHENTICATED',
+    errorStatus: 401,
+  },
+};
+
 class ApiError extends Error {
-  statusCode: number;
-  constructor(statusCode: number, message: string | undefined, stack = "") {
+  errorType: any;
+  constructor(errorType: any, message: string | undefined, stack = '') {
     super(message);
-    this.statusCode = statusCode;
-    this.name = this.constructor.name;
-    this.message = message || "Something went wrong. Please try again.";
-    this.stack = stack;
+    this.errorType = errorType;
+    this.message = message || 'Something went wrong. Please try again.';
     if (stack) {
       this.stack = stack;
     } else {

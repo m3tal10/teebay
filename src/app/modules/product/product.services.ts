@@ -1,8 +1,5 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { Product, User } from '@prisma/client';
-import ApiError from '../../../errors/ApiErrors';
-import config from '../../../config';
+import { Product } from '@prisma/client';
+import ApiError, { ErrorTypes } from '../../../errors/ApiErrors';
 import prisma from '../../../helpers/prisma';
 
 const getAllProductsFromDB = async () => {
@@ -22,7 +19,10 @@ const getSingleProduct = async (productId: string) => {
 const getMyProducts = async (context: any) => {
   const user = context.user;
   if (!user) {
-    throw new ApiError(400, "You're not logged in. Please log in to continue.");
+    throw new ApiError(
+      ErrorTypes.UNAUTHENTICATED,
+      "You're not logged in. Please log in to continue.",
+    );
   }
   const newUser = await prisma.user.findUniqueOrThrow({
     where: {
