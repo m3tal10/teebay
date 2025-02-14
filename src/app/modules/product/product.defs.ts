@@ -35,14 +35,24 @@ export const productDefs = gql`
     updatedAt: String!
   }
 
+  type RentProducts {
+    id: ID!
+    product: Product!
+    renter: User!
+    startTime: String!
+    endTime: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
   type Query {
     products: [Product!]!
     myProducts: [Product!]!
     product(id: ID!): Product
     boughtProducts: [Product!]!
     soldProducts: [Product!]!
-    borrowedProducts: [Product!]!
-    lentProducts: [Product!]!
+    borrowedProducts: [RentProducts!]!
+    lentProducts: [RentProducts!]!
   }
 
   type Mutation {

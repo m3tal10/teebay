@@ -44,6 +44,11 @@ export const productResolvers = {
         return products;
       },
     ),
+    // Get currently logged in user's lent products
+    lentProducts: catchAsync(async (_parent: any, _args: any, context: any) => {
+      const products = await productServices.getLentProducts(context);
+      return products;
+    }),
   },
   Mutation: {
     // Create a new product

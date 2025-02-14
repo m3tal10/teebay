@@ -83,12 +83,26 @@ const getBorrowedProducts = async (context: any) => {
     where: {
       renterId: user.id,
     },
-    select: {
+    include: {
       product: true,
     },
   });
+  return borrowedProducts;
+};
 
-  return borrowedProducts.map(rp => rp.product);
+// Get lent products
+const getLentProducts = async (context: any) => {
+  const user = context.user;
+  authenticateUser(user);
+  const lentProducts = await prisma.productRent.findMany({
+    where: {
+      product: { ownerId: user.id },
+    },
+    include: {
+      product: true,
+    },
+  });
+  return lentProducts;
 };
 
 // Rent product
@@ -279,6 +293,7 @@ export const productServices = {
   rentProduct,
   buyProduct,
   getBorrowedProducts,
+  getLentProducts,
   getSingleProduct,
   createProduct,
   updateProduct,
