@@ -3,8 +3,16 @@ import AppError, { ErrorTypes } from '../../../errors/AppError';
 import prisma from '../../../helpers/prisma';
 import authenticateUser from '../../../helpers/authenticateUser';
 
-const getAllProductsFromDB = async () => {
-  const products = await prisma.product.findMany();
+const getAllProductsFromDB = async (context: any) => {
+  const user = context.user;
+  authenticateUser(user);
+  const products = await prisma.product.findMany({
+    where: {
+      ownerId: {
+        not: user.id,
+      },
+    },
+  });
   return products;
 };
 

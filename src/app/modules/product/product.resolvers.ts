@@ -5,8 +5,8 @@ import { productServices } from './product.services';
 export const productResolvers = {
   Query: {
     // Get all products
-    products: catchAsync(async () => {
-      const products = await productServices.getAllProductsFromDB();
+    products: catchAsync(async (_parent, _args, context) => {
+      const products = await productServices.getAllProductsFromDB(context);
       return products;
     }),
 
