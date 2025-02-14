@@ -11,6 +11,10 @@ export const ErrorTypes = {
     errorCode: 'UNAUTHENTICATED',
     errorStatus: 401,
   },
+  FORBIDDEN: {
+    errorCode: 'FORBIDDEN',
+    errorStatus: 403,
+  },
 };
 
 class AppError extends Error {

@@ -1,6 +1,7 @@
-import { Product } from '@prisma/client';
+import { Product, ProductRent } from '@prisma/client';
 import AppError, { ErrorTypes } from '../../../errors/AppError';
 import prisma from '../../../helpers/prisma';
+import authenticateUser from '../../../helpers/authenticateUser';
 
 const getAllProductsFromDB = async () => {
   const products = await prisma.product.findMany();
@@ -18,12 +19,9 @@ const getSingleProduct = async (productId: string) => {
 
 const getMyProducts = async (context: any) => {
   const user = context.user;
-  if (!user) {
-    throw new AppError(
-      ErrorTypes.UNAUTHENTICATED,
-      "You're not logged in. Please log in to continue.",
-    );
-  }
+  // helper function to authenticate user or throw error...
+
+  authenticateUser(user);
   const newUser = await prisma.user.findUniqueOrThrow({
     where: {
       id: user.id,
@@ -35,20 +33,59 @@ const getMyProducts = async (context: any) => {
   return newUser.Products;
 };
 
-const buyProduct = async (context: any, productId: string) => {
+const rentProduct = async (
+  context: any,
+  productId: string,
+  payload: ProductRent,
+) => {
   const user = context.user;
-  return;
-  // const product = await
+  const rentStartTime = new Date(payload.startTime);
+  const rentEndTime = new Date(payload.endTime);
+  authenticateUser(user);
+  const product = await prisma.product.findFirst({
+    where: {
+      id: productId,
+    },
+  });
+  if (!product) {
+    throw new AppError(
+      ErrorTypes.NOT_FOUND,
+      ' This product is not available anymore.',
+    );
+  }
+  // Checking if the product is already up for rent at the specified time.
+  const existingRental = await prisma.productRent.findFirst({
+    where: {
+      productId: productId,
+      AND: [
+        { startTime: { lte: rentEndTime } },
+        { endTime: { gte: rentStartTime } },
+      ],
+    },
+  });
+  if (existingRental) {
+    throw new AppError(
+      ErrorTypes.BAD_REQUEST,
+      'The product is up for rental at the given time. Please choose another time.',
+    );
+  }
+  const productRent = await prisma.productRent.create({
+    data: {
+      renterId: user.id,
+      productId: productId,
+      startTime: rentStartTime,
+      endTime: rentEndTime,
+    },
+  });
+
+  return product;
 };
 
 const createProduct = async (context: any, payload: Product) => {
   const user = context.user;
-  if (!user) {
-    throw new AppError(
-      400,
-      'You are not logged in. Please log in to continue.',
-    );
-  }
+  // helper function to authenticate user or throw error...
+
+  authenticateUser(user);
   const newProduct = await prisma.product.create({
     data: {
       ...payload,
@@ -64,16 +101,17 @@ const updateProduct = async (
   payload: Product,
 ) => {
   const user = context.user;
-  if (!user) {
-    throw new AppError(400, 'You are not logged in please log in to continue.');
-  }
+  authenticateUser(user);
   const product = await prisma.product.findFirstOrThrow({
     where: {
       id: productId,
     },
   });
   if (product.ownerId !== user.id) {
-    throw new AppError(403, 'You are not authorized to update this product.');
+    throw new AppError(
+      ErrorTypes.FORBIDDEN,
+      'You are not authorized to update this product.',
+    );
   }
   const updatedProduct = await prisma.product.update({
     where: {
@@ -88,16 +126,18 @@ const updateProduct = async (
 
 const deleteProduct = async (context: any, productId: string) => {
   const user = context.user;
-  if (!user) {
-    throw new AppError(400, 'You are not logged in please log in to continue.');
-  }
+  // helper function to authenticate user or throw error...
+  authenticateUser(user);
   const product = await prisma.product.findFirstOrThrow({
     where: {
       id: productId,
     },
   });
   if (product.ownerId !== user.id) {
-    throw new AppError(403, 'You are not authorized to update this product.');
+    throw new AppError(
+      ErrorTypes.FORBIDDEN,
+      'You are not authorized to update this product.',
+    );
   }
   // Deleting the product instead of soft deleting
   const deletedProduct = await prisma.product.delete({
@@ -111,6 +151,7 @@ const deleteProduct = async (context: any, productId: string) => {
 export const productServices = {
   getAllProductsFromDB,
   getMyProducts,
+  rentProduct,
   getSingleProduct,
   createProduct,
   updateProduct,

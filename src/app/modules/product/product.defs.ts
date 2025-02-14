@@ -52,6 +52,8 @@ export const productDefs = gql`
       rentOption: RentOption
     ): Product!
 
+    rentProduct(id: ID!, startTime: String!, endTime: String!): Product!
+
     deleteProduct(id: ID!): Boolean!
   }
 `;

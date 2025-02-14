@@ -32,8 +32,10 @@ export const productResolvers = {
     }),
 
     // Buy a product
-    buyProduct: catchAsync(async (_, args: any, context: any) => {
-      return;
+    rentProduct: catchAsync(async (_, args: any, context: any) => {
+      const { id } = args;
+      const product = await productServices.rentProduct(context, id, args);
+      return product;
     }),
 
     // Update an existing product
