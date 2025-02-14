@@ -31,6 +31,11 @@ export const productResolvers = {
       return newProduct;
     }),
 
+    // Buy a product
+    buyProduct: catchAsync(async (_, args: any, context: any) => {
+      return;
+    }),
+
     // Update an existing product
     updateProduct: catchAsync(
       async (_parent: any, args: Product, context: any) => {

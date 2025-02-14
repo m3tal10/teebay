@@ -1,7 +1,7 @@
 import { userServices } from './user.services';
 import { User } from '@prisma/client';
 import catchAsync from '../../../shared/catchAsync';
-import ApiError from '../../../errors/ApiErrors';
+import AppError from '../../../errors/AppError';
 
 export const userResolvers = {
   Query: {
@@ -12,7 +12,7 @@ export const userResolvers = {
 
     //get user by id
     user: async (_parent: any, args: { id: string }, context: any) => {
-      if (!context.user) throw new ApiError(401, 'Not authenticated');
+      if (!context.user) throw new AppError(401, 'Not authenticated');
       return await userServices.getSingleUserFromDB(args.id);
     },
 
@@ -20,7 +20,7 @@ export const userResolvers = {
     me: async (_parent: any, _args: any, context: any) => {
       const user = context.user;
       if (!user) {
-        throw new ApiError(
+        throw new AppError(
           400,
           "You're not logged in. Please log in to continue.",
         );

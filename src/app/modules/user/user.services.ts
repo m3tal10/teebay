@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { User } from '@prisma/client';
-import ApiError from '../../../errors/ApiErrors';
+import AppError from '../../../errors/AppError';
 import config from '../../../config';
 import prisma from '../../../helpers/prisma';
 
@@ -17,7 +17,7 @@ const getSingleUserFromDB = async (userId: string) => {
     },
   });
   if (!user) {
-    throw new ApiError(404, 'User not found');
+    throw new AppError(404, 'User not found');
   }
   return user;
 };
@@ -28,7 +28,7 @@ const createUserInDB = async (payload: User) => {
   });
 
   if (isExist) {
-    throw new ApiError(400, 'User already exist');
+    throw new AppError(400, 'User already exist');
   }
   const hashedPassword = await bcrypt.hash(payload.password, 10);
   const user = await prisma.user.create({
@@ -49,7 +49,7 @@ const loginUserInDB = async (payload: User) => {
   const user = await prisma.user.findUnique({
     where: { email: payload.email },
   });
-  if (!user) throw new ApiError(404, 'User not found');
+  if (!user) throw new AppError(404, 'User not found');
 
   const valid = await bcrypt.compare(payload.password, user.password);
   if (!valid) throw new Error('Invalid password');
@@ -74,7 +74,7 @@ const updateProfile = async (payload: User) => {
 const updateMe = async (context: any, payload: User) => {
   const user = context.user;
   if (!user) {
-    throw new ApiError(400, "You're not logged in. Please log in to continue.");
+    throw new AppError(400, "You're not logged in. Please log in to continue.");
   }
   const updatedUser = await prisma.user.update({
     where: { id: user.id },

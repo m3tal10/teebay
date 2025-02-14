@@ -1,5 +1,5 @@
 import { Product } from '@prisma/client';
-import ApiError, { ErrorTypes } from '../../../errors/ApiErrors';
+import AppError, { ErrorTypes } from '../../../errors/AppError';
 import prisma from '../../../helpers/prisma';
 
 const getAllProductsFromDB = async () => {
@@ -19,7 +19,7 @@ const getSingleProduct = async (productId: string) => {
 const getMyProducts = async (context: any) => {
   const user = context.user;
   if (!user) {
-    throw new ApiError(
+    throw new AppError(
       ErrorTypes.UNAUTHENTICATED,
       "You're not logged in. Please log in to continue.",
     );
@@ -35,10 +35,16 @@ const getMyProducts = async (context: any) => {
   return newUser.Products;
 };
 
+const buyProduct = async (context: any, productId: string) => {
+  const user = context.user;
+  return;
+  // const product = await
+};
+
 const createProduct = async (context: any, payload: Product) => {
   const user = context.user;
   if (!user) {
-    throw new ApiError(
+    throw new AppError(
       400,
       'You are not logged in. Please log in to continue.',
     );
@@ -59,7 +65,7 @@ const updateProduct = async (
 ) => {
   const user = context.user;
   if (!user) {
-    throw new ApiError(400, 'You are not logged in please log in to continue.');
+    throw new AppError(400, 'You are not logged in please log in to continue.');
   }
   const product = await prisma.product.findFirstOrThrow({
     where: {
@@ -67,7 +73,7 @@ const updateProduct = async (
     },
   });
   if (product.ownerId !== user.id) {
-    throw new ApiError(403, 'You are not authorized to update this product.');
+    throw new AppError(403, 'You are not authorized to update this product.');
   }
   const updatedProduct = await prisma.product.update({
     where: {
@@ -83,7 +89,7 @@ const updateProduct = async (
 const deleteProduct = async (context: any, productId: string) => {
   const user = context.user;
   if (!user) {
-    throw new ApiError(400, 'You are not logged in please log in to continue.');
+    throw new AppError(400, 'You are not logged in please log in to continue.');
   }
   const product = await prisma.product.findFirstOrThrow({
     where: {
@@ -91,7 +97,7 @@ const deleteProduct = async (context: any, productId: string) => {
     },
   });
   if (product.ownerId !== user.id) {
-    throw new ApiError(403, 'You are not authorized to update this product.');
+    throw new AppError(403, 'You are not authorized to update this product.');
   }
   // Deleting the product instead of soft deleting
   const deletedProduct = await prisma.product.delete({

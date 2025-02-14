@@ -13,7 +13,7 @@ export const ErrorTypes = {
   },
 };
 
-class ApiError extends Error {
+class AppError extends Error {
   errorType: any;
   constructor(errorType: any, message: string | undefined, stack = '') {
     super(message);
@@ -27,4 +27,4 @@ class ApiError extends Error {
   }
 }
 
-export default ApiError;
+export default AppError;

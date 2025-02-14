@@ -1,8 +1,8 @@
 import { GraphQLError } from 'graphql';
-import ApiError from '../../errors/ApiErrors';
+import AppError from '../../errors/AppError';
 
 const graphqlErrorHandler = (error: GraphQLError) => {
-  const originalError = error.originalError as ApiError;
+  const originalError = error.originalError as AppError;
   console.error(originalError);
   // Default error response
   const formattedError = new GraphQLError(error.message, {

@@ -8,36 +8,81 @@ datasource db {
 }
 
 model User {
-  id        String    @id @unique @default(uuid())
-  firstName String
-  lastName  String
-  address   String?
-  email     String    @unique
-  phone     String?
-  password  String
-  Products  Product[]
+  id            String        @id @unique @default(uuid())
+  firstName     String
+  lastName      String
+  address       String?
+  email         String        @unique
+  phone         String?
+  password      String
+  Products      Product[]
+  ProductRent   ProductRent[]
+  ProductBought ProductBuy[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
 }
 
 model Product {
-  id          String            @id @unique @default(uuid())
-  title       String
-  ownerId     String
-  owner       User              @relation(fields: [ownerId], references: [id])
-  categories  ProductCategory[]
-  description String
-  buyPrice    Float
-  rentPrice   Float
-  rentOption  RentOption
+  id            String            @id @unique @default(uuid())
+  title         String
+  ownerId       String
+  owner         User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  categories    ProductCategory[]
+  description   String
+  buyPrice      Float
+  rentPrice     Float
+  status        ProductStatus     @default(AVAILABLE)
+  rentOption    RentOption
+  ProductRent   ProductRent[]
+  ProductBought ProductBuy[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("products")
+}
+
+model ProductRent {
+  id        String   @id @unique @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  renterId  String
+  renter    User     @relation(fields: [renterId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("product_rent")
+}
+
+model ProductBuy {
+  id        String  @id @unique @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  buyerId   String
+  buyer     User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("product_buy")
 }
 
 enum RentOption {
   DAILY
   WEEKLY
   MONTHLY
+}
+
+enum ProductStatus {
+  AVAILABLE
+  LENT
+  SOLD
 }
 
 enum ProductCategory {
