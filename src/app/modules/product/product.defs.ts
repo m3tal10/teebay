@@ -40,6 +40,7 @@ export const productDefs = gql`
     myProducts: [Product!]!
     product(id: ID!): Product
     boughtProducts: [Product!]!
+    soldProducts: [Product!]!
   }
 
   type Mutation {

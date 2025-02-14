@@ -31,6 +31,14 @@ export const productResolvers = {
         return products;
       },
     ),
+    // Get currently logged in user's sold products
+    soldProducts: catchAsync(async (_parent: any, _args: any, context: any) => {
+      const products = await productServices.getSoldProducts(context);
+      return products;
+    }),
+
+    // Get currently logged in user's borrowed products
+    // borrowedProducts
   },
   Mutation: {
     // Create a new product

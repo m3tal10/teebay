@@ -42,7 +42,6 @@ const getMyProducts = async (context: any) => {
 };
 
 // Get currently logged in user's bought products
-
 const getBoughtProducts = async (context: any) => {
   const user = context.user;
   authenticateUser(user);
@@ -55,6 +54,25 @@ const getBoughtProducts = async (context: any) => {
     },
   });
   return boughtProducts.map(pb => pb.product);
+};
+
+// Get currently logged in user's sold products
+const getSoldProducts = async (context: any) => {
+  const user = context.user;
+  authenticateUser(user);
+  const soldProducts = await prisma.user.findFirst({
+    where: {
+      id: user.id,
+    },
+    select: {
+      Products: {
+        where: {
+          status: 'SOLD',
+        },
+      },
+    },
+  });
+  return soldProducts?.Products;
 };
 
 // Rent product
@@ -128,6 +146,8 @@ const buyProduct = async (context: any, productId: string) => {
       'This product is not available for sell anymore.',
     );
   }
+
+  // checking if the product is scheduled to be rent.
   const productOnRent = await prisma.productRent.findFirst({
     where: {
       endTime: {
@@ -135,12 +155,16 @@ const buyProduct = async (context: any, productId: string) => {
       },
     },
   });
+
+  // If a rent is scheduled on the product then the product cannot be sold.
   if (productOnRent) {
     throw new AppError(
       ErrorTypes.BAD_REQUEST,
       'A rent is scheduled on this product. You cannot buy this product now.',
     );
   }
+
+  // Multiple operations using prisma transaction for data integrity.(If either of the operation fails both fail.)
   await prisma.$transaction(async prisma => {
     await prisma.productBuy.create({
       data: {
@@ -160,6 +184,8 @@ const buyProduct = async (context: any, productId: string) => {
   });
   return product;
 };
+
+// Create a product
 const createProduct = async (context: any, payload: Product) => {
   const user = context.user;
   // helper function to authenticate user or throw error...
@@ -174,6 +200,7 @@ const createProduct = async (context: any, payload: Product) => {
   return newProduct;
 };
 
+// Update a product
 const updateProduct = async (
   context: any,
   productId: string,
@@ -203,6 +230,7 @@ const updateProduct = async (
   return updatedProduct;
 };
 
+// Delete a product
 const deleteProduct = async (context: any, productId: string) => {
   const user = context.user;
   // helper function to authenticate user or throw error...
@@ -231,6 +259,7 @@ export const productServices = {
   getAllProductsFromDB,
   getMyProducts,
   getBoughtProducts,
+  getSoldProducts,
   rentProduct,
   buyProduct,
   getSingleProduct,
