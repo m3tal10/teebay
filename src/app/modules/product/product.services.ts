@@ -12,6 +12,7 @@ const getAllProductsFromDB = async (context: any) => {
       ownerId: {
         not: user.id,
       },
+      status:"AVAILABLE"
     },
   });
   return products;
@@ -213,6 +214,7 @@ const buyProduct = async (context: any, productId: string) => {
   // checking if the product is scheduled to be rent.
   const productOnRent = await prisma.productRent.findFirst({
     where: {
+      productId:product.id,
       endTime: {
         gt: new Date(Date.now()),
       },
