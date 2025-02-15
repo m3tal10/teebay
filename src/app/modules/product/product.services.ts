@@ -298,7 +298,7 @@ const deleteProduct = async (context: any, productId: string) => {
       id: productId,
     },
   });
-  return deletedProduct;
+  return true;
 };
 
 export const productServices = {
