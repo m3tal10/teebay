@@ -13,7 +13,7 @@ export const productResolvers = {
     //Get a single product
     product: catchAsync(
       async (_parent: any, _args: { id: string }, context: any) => {
-        const product = await productServices.getSingleProduct(_args.id);
+        const product = await productServices.getSingleProduct(context,_args.id);
         return product;
       },
     ),

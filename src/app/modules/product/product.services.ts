@@ -17,15 +17,32 @@ const getAllProductsFromDB = async (context: any) => {
   return products;
 };
 
-const getSingleProduct = async (productId: string) => {
-  const product = await prisma.product.update({
+const getSingleProduct = async (context:any,productId: string) => {
+  const user = context.user
+authenticateUser(user)
+  const product = await prisma.product.findFirst({
     where: {
       id: productId,
     },
-    data: {
-      viewCount: { increment: 1 },
-    },
   });
+  if(!product){
+    throw new AppError(ErrorTypes.NOT_FOUND,"This product is not available anymore.")
+  }
+  if(user.id!==product?.ownerId){
+    await prisma.product.update(
+      {
+        where:{
+          id:product.id
+        },
+        data:{
+          viewCount:{
+            increment:1
+          }
+        }
+      }
+    )
+  }
+  
   return product;
 };
 
